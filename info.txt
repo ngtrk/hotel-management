@@ -1,0 +1,18 @@
+NAME (1): kien
+CITIZEN ID (1): 41242
+AGE (1): 23
+NAME (2): trung
+CITIZEN ID (2): 89081
+AGE (2): 44
+NAME (3): nguyen
+CITIZEN ID (3): 76632
+AGE (3): 52
+DAYS BOOKED: 3
+ROOM NUMBER: 1
+---------------------------------------------------
+NAME (1): minh
+CITIZEN ID (1): 41231
+AGE (1): 42
+DAYS BOOKED: 1
+ROOM NUMBER: 2
+---------------------------------------------------
