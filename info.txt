@@ -16,3 +16,18 @@ AGE (1): 42
 DAYS BOOKED: 1
 ROOM NUMBER: 2
 ---------------------------------------------------
+NAME (1): lan
+CITIZEN ID (1): 89893
+AGE (1): 33
+DAYS BOOKED: 2
+ROOM NUMBER: 3
+---------------------------------------------------
+NAME (1): drake
+CITIZEN ID (1): 43843
+AGE (1): 15
+NAME (2): djsnake
+CITIZEN ID (2): 21319
+AGE (2): 34
+DAYS BOOKED: 3
+ROOM NUMBER: 4
+---------------------------------------------------
