@@ -48,9 +48,10 @@ public:
 	}
 	void menu();
 	void book();
-	void customer_record();
-	void booked_rooms();
+	void list_of_guests();
+	void room_info();
 	void edit();
+	void guest_info();
 
 };
 
@@ -106,8 +107,7 @@ void Hotel::book() {
 }
 
 
-void Hotel::customer_record() {
-	system("cls");
+void Hotel::list_of_guests() {
 	std::string line;
 	std::ifstream file("info.txt");
 	std::pair<int[2], Person> temp;
@@ -120,7 +120,7 @@ void Hotel::customer_record() {
 			
 			if (line[0] == '-') {
 				temp.first[0] = days_of_room[0];
-				temp.first[0] = days_of_room[1];
+				temp.first[1] = days_of_room[1];
 				temp.second = person;
 
 				guests.push_back(temp);
@@ -184,22 +184,66 @@ void Hotel::customer_record() {
 		}
 		file.close();
 	}
+}
+
+
+
+void Hotel::room_info() {
+	// show guests info in one room
+	system("cls");
+	int room_number;
+	std::cout << "\n\t\t\t\tEnter room number: ";
+	std::cin >> room_number;
 	
-	else std::cout << "Unable to open file" << std::endl;
-	
+	for (int i = 0; i < guests.size(); i++) {
+		if (room_number == guests[i].first[1]) {
+			std::cout << "\n\t\t\t\tNAME:"  << guests[i].second.name << std::endl;
+			std::cout << "\n\t\t\t\tCITIZEN_ID:"  << guests[i].second.citizen_id << std::endl;
+			std::cout << "\n\t\t\t\tAGE:"  << guests[i].second.age << std::endl;
+			std::cout << "\n\t\t\t\t---------------------------------" << std::endl;
+
+		}
+	}
 	if (_getch()) {}
 }
 
 
+void Hotel::guest_info() {
+	system("cls");
 
-void Hotel::booked_rooms() {
-	// show guests info in one room
-	std::cout << "Room number: ";
-	int room_number = _getch();
+	std::string guest_name;
+	std::cout << "\n\t\t\t\tEnter guest's name: ";
+	std::cin >> guest_name;
+	bool res = false;
 
+	for (int i = 0; i < guests.size(); i++) {
+		for (int j = 0; j < guests[i].second.name.size(); j++) {
+			if (guests[i].second.name[j] == guest_name[0]) {
+				
+				int k = 0;
+				int g = j;
+				while (guests[i].second.name[g] == guest_name[k]) {
+					k++; g++;
+					
+				}
+				
+				if (k == guest_name.size()) {
+					res = true;
+					std::cout << "\n\t\t\t\tNAME: " << guests[i].second.name << std::endl;
+					std::cout << "\n\t\t\t\tCITIZEN_ID: " << guests[i].second.citizen_id << std::endl;
+					std::cout << "\n\t\t\t\tAGE: " << guests[i].second.age << std::endl;
+					std::cout << "\n\t\t\t\tROOM: " << guests[i].first[1] << std::endl;
+					std::cout << "\n\t\t\t\t---------------------------------" << std::endl;
+				}
+			}
+		}
+	}
+	if (res == false) std::cout << "\t\t\t\tNone matches your result!";
 
-
+	if (_getch()) {}
 }
+
+
 
 void Hotel::edit() {}
 
@@ -207,14 +251,15 @@ void Hotel::edit() {}
 void Hotel::menu() {
 	while (true) {
 		system("cls");
+		list_of_guests();
 		std::cout << "\n\t\t\t\t*************";
 		std::cout << "\n\t\t\t\t* MAIN MENU *";
 		std::cout << "\n\t\t\t\t*************";
-		std::cout << "\n\n\n\t\t\t1.Book A Room";
-		std::cout << "\n\t\t\t2.Customer Record";
-		std::cout << "\n\t\t\t3.Rooms Allotted";
-		std::cout << "\n\t\t\t4.Edit Record";
-		std::cout << "\n\t\t\t5.Exit";
+		std::cout << "\n\n\n\t\t\t1. Book A Room";
+		std::cout << "\n\t\t\t2. Guest's Information";
+		std::cout << "\n\t\t\t3. Edit Record";
+		std::cout << "\n\t\t\t4. Room's Information";
+		std::cout << "\n\t\t\t5. Exit";
 		std::cout << "\n\n\t\t\tEnter Your Choice: ";
 
 		switch (_getch()) {
@@ -222,13 +267,13 @@ void Hotel::menu() {
 			book();
 			break;
 		case '2':
-			customer_record();
+			guest_info();
 			break;
 		case '3':
 			edit();
 			break;
 		case '4':
-			booked_rooms();
+			room_info();
 			break;
 		case '5':
 			exit(0);

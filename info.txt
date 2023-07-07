@@ -1,33 +1,6 @@
 NAME (1): kien
-CITIZEN ID (1): 41242
+CITIZEN ID (1): 57513
 AGE (1): 23
-NAME (2): trung
-CITIZEN ID (2): 89081
-AGE (2): 44
-NAME (3): nguyen
-CITIZEN ID (3): 76632
-AGE (3): 52
-DAYS BOOKED: 3
-ROOM NUMBER: 1
----------------------------------------------------
-NAME (1): minh
-CITIZEN ID (1): 41231
-AGE (1): 42
-DAYS BOOKED: 1
-ROOM NUMBER: 2
----------------------------------------------------
-NAME (1): lan
-CITIZEN ID (1): 89893
-AGE (1): 33
 DAYS BOOKED: 2
-ROOM NUMBER: 3
----------------------------------------------------
-NAME (1): drake
-CITIZEN ID (1): 43843
-AGE (1): 15
-NAME (2): djsnake
-CITIZEN ID (2): 21319
-AGE (2): 34
-DAYS BOOKED: 3
-ROOM NUMBER: 4
+ROOM NUMBER: 1
 ---------------------------------------------------
