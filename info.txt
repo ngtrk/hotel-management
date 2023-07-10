@@ -1,21 +1,30 @@
 NAME (1): kien
-CITIZEN ID (1): 57513
-AGE (1): 23
-DAYS BOOKED: 2
+CITIZEN ID (1): 75839
+AGE (1): 22
+DAYS BOOKED: 3
 ROOM NUMBER: 1
 ---------------------------------------------------
-NAME (1): sabeo
-CITIZEN ID (1): 23240
-AGE (1): 34
-NAME (2): abcde
-CITIZEN ID (2): 89037
-AGE (2): 41
-DAYS BOOKED: 3
-ROOM NUMBER: 100
----------------------------------------------------
-NAME (1): obs
-CITIZEN ID (1): 89211
-AGE (1): 33
-DAYS BOOKED: 1
+NAME (1): sabe
+CITIZEN ID (1): 21441
+AGE (1): 42
+DAYS BOOKED: 4
 ROOM NUMBER: 2
+---------------------------------------------------
+NAME (2): besaa
+CITIZEN ID (2): 78921
+AGE (2): 44
+DAYS BOOKED: 4
+ROOM NUMBER: 2
+---------------------------------------------------
+NAME (1): mary
+CITIZEN ID (1): 89472
+AGE (1): 35
+DAYS BOOKED: 4
+ROOM NUMBER: 3
+---------------------------------------------------
+NAME (2): crooss
+CITIZEN ID (2): 77711
+AGE (2): 25
+DAYS BOOKED: 4
+ROOM NUMBER: 3
 ---------------------------------------------------
