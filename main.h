@@ -30,30 +30,55 @@ public:
 
 class Hotel {
 private:
-	int room_num;
 	int people_num;
 	int days;
-	bool n_rooms[N_ROOMS];
+	int n_rooms[N_ROOMS];
 
 	std::vector<std::pair<int[2], Person>> guests; // int[2] for days and room_num
 
 public:
 	Hotel() {
-		room_num = 0;
 		people_num = 0;
 		days = 0;
 
-		for (int i = 0; i < N_ROOMS; ++i) n_rooms[i] = false;
+		for (int i = 0; i < N_ROOMS; ++i) n_rooms[i] = 0;
 
 	}
+
+
 	void menu();
 	void book();
 	void list_of_guests();
 	void room_info();
-	void edit();
+	void remove_room();
 	void guest_info();
-
+	void save_info();
 };
+
+
+
+
+void Hotel::save_info() {
+	std::ofstream file("temp.txt");
+	if (file.is_open()) {
+		for (int i = 0; i < guests.size(); i++) {
+			file << "NAME (" << i + 1 << "): " << guests[i].second.name << std::endl;
+			file << "CITIZEN ID (" << i + 1 << "): " << guests[i].second.citizen_id << std::endl;
+			file << "AGE (" << i + 1 << "): " << guests[i].second.age << std::endl;
+			file << "DAYS BOOKED: " << guests[i].first[0] << std::endl;
+			file << "ROOM NUMBER: " << guests[i].first[1] << std::endl;
+			file << "---------------------------------------------------" << std::endl;
+		}
+		
+		file.close();
+	}
+	else std::cout << "\n\t\t\t\t Unable to open file" << std::endl;
+
+
+	remove("input.txt");
+	if (rename("temp.txt", "input.txt")) {};
+}
+
 
 
 void Hotel::book() {
@@ -64,11 +89,11 @@ void Hotel::book() {
 	int age;
 	
 	if (file.is_open()) {
-		std::cout << "Number of people: ";
+		std::cout << "\n\t\t\t\t Number of people: ";
 		std::cin >> people_num;
 		
 		for (int i = 0; i < people_num; i++) {
-			std::cout << "Name of guest: ";
+			std::cout << "\n\t\t\t\t Name of guest: ";
 			std::cin >> name;
 			file << "NAME (" << i + 1 << "): " << name << std::endl;
 
@@ -82,29 +107,32 @@ void Hotel::book() {
 
 		}
 
-		std::cout << "Days booked: ";
+		std::cout << "\n\t\t\t\t Days booked: ";
 		std::cin >> days;
 		file << "DAYS BOOKED: " << days << std::endl;
-
+		int room_num;
 		do {
-			std::cout << "Room number: ";
+			std::cout << "\n\t\t\t\t Room number: ";
 			std::cin >> room_num;
-			if (n_rooms[room_num]) std::cout << "The room is not available!" << std::endl;
-		} while (n_rooms[room_num]);
+			if (n_rooms[room_num - 1]) std::cout << "The room is not available." << std::endl;
+			else if (1 > room_num || room_num > 101) std::cout << "The room is not correct." << std::endl;
+		} while ((1 > room_num || room_num > 101) || (n_rooms[room_num - 1]));
+
 
 		file << "ROOM NUMBER: " << room_num << std::endl;
 
-		n_rooms[room_num] = true;
+		n_rooms[room_num - 1] = true;
 		file << "---------------------------------------------------" << std::endl;
 		file.close();
-		std::cout << "Booking completed. Press any key to continue...\n" << std::endl;
+		std::cout << "\n\t\t\t\t Booking completed. Press any key to continue...\n" << std::endl;
 	}
-	else std::cout << "Unable to open file" << std::endl;
+	else std::cout << "\n\t\t\t\t Unable to open file" << std::endl;
 
 	
 
-	if(_getch()) {} //ignore return value
+	if (_getch()) {} //ignore return value
 }
+
 
 
 void Hotel::list_of_guests() {
@@ -168,8 +196,9 @@ void Hotel::list_of_guests() {
 						i++;
 						k *= 10;
 					}
-					
-					n_rooms[days_of_room[1]] = true;
+
+
+					if (0 <= days_of_room[1] - 1 && days_of_room[1] - 1 < 100) n_rooms[days_of_room[1] - 1] += 1;
 				}
 				else {
 					while (i < line.size()) {
@@ -189,23 +218,32 @@ void Hotel::list_of_guests() {
 
 
 void Hotel::room_info() {
-	// show guests info in one room
-	system("cls");
 	int room_number;
-	std::cout << "\n\t\t\t\tEnter room number: ";
-	std::cin >> room_number;
-	
-	for (int i = 0; i < guests.size(); i++) {
-		if (room_number == guests[i].first[1]) {
-			std::cout << "\n\t\t\t\tNAME:"  << guests[i].second.name << std::endl;
-			std::cout << "\n\t\t\t\tCITIZEN_ID:"  << guests[i].second.citizen_id << std::endl;
-			std::cout << "\n\t\t\t\tAGE:"  << guests[i].second.age << std::endl;
-			std::cout << "\n\t\t\t\t---------------------------------" << std::endl;
 
+	do {
+		system("cls");
+		std::cout << "\n\t\t\t\t Enter room number: ";
+		std::cin >> room_number;
+
+		if (1 > room_number || room_number > 101) std::cout << "\n\t\t\t\t The room is not found!" << std::endl;
+	} while (1 > room_number || room_number > 101);
+
+	if (n_rooms[room_number - 1] > 0) {
+		for (int i = 0; i < guests.size(); i++) {
+			if (room_number == guests[i].first[1]) {
+				std::cout << "\n\t\t\t\t NAME: " << guests[i].second.name << std::endl;
+				std::cout << "\n\t\t\t\t CITIZEN_ID: " << guests[i].second.citizen_id << std::endl;
+				std::cout << "\n\t\t\t\t AGE: " << guests[i].second.age << std::endl;
+				std::cout << "\n\t\t\t\t ---------------------------------" << std::endl;
+
+			}
 		}
 	}
+	else std::cout << "\n\t\t\t\t The room is empty." << std::endl;
+	
 	if (_getch()) {}
 }
+
 
 
 void Hotel::guest_info() {
@@ -223,44 +261,74 @@ void Hotel::guest_info() {
 				int k = 0;
 				int g = j;
 				while (guests[i].second.name[g] == guest_name[k]) {
-					k++; g++;
-					
+					k++; g++;				
 				}
 				
-				if (k == guest_name.size()) {
+				if (k == guest_name.size() || g == guests[i].second.name.size()) {
 					res = true;
-					std::cout << "\n\t\t\t\tNAME: " << guests[i].second.name << std::endl;
-					std::cout << "\n\t\t\t\tCITIZEN_ID: " << guests[i].second.citizen_id << std::endl;
-					std::cout << "\n\t\t\t\tAGE: " << guests[i].second.age << std::endl;
-					std::cout << "\n\t\t\t\tROOM: " << guests[i].first[1] << std::endl;
-					std::cout << "\n\t\t\t\t---------------------------------" << std::endl;
+
+					std::cout << "\n\t\t\t\t NAME: " << guests[i].second.name << std::endl;
+					std::cout << "\n\t\t\t\t CITIZEN_ID: " << guests[i].second.citizen_id << std::endl;
+					std::cout << "\n\t\t\t\t AGE: " << guests[i].second.age << std::endl;
+					std::cout << "\n\t\t\t\t ROOM: " << guests[i].first[1] << std::endl;
+					std::cout << "\n\t\t\t\t ---------------------------------" << std::endl;
 				}
 			}
 		}
 	}
-	if (res == false) std::cout << "\t\t\t\tNone matches your result!";
+	if (!res) std::cout << "\t\t\t\t None matches your result!";
 
 	if (_getch()) {}
 }
 
 
 
-void Hotel::edit() {}
+void Hotel::remove_room() {	
+	int room_number;
+
+	do {
+		system("cls");
+		std::cout << "\n\t\t\t\t Enter room number: ";
+		std::cin >> room_number;
+
+		if (1 > room_number || room_number > 101) std::cout << "\n\t\t\t\t The room is not found!" << std::endl;
+	} while (1 > room_number || room_number > 101);
+
+	
+	if (n_rooms[room_number - 1] > 0) {
+		for (int i = 0; i < guests.size(); i++) {
+			if (room_number == guests[i].first[1]) {
+				std::iter_swap(guests.begin() + i, guests.end());
+				guests.pop_back();
+				n_rooms[room_number - 1] = 0;
+				break;
+			}
+		}
+		
+	}
+
+	else std::cout << "\n\t\t\t\t The room is empty." << std::endl;
+
+	save_info();
+
+	if (_getch()) {}
+
+}
 
 
 void Hotel::menu() {
 	while (true) {
 		system("cls");
 		list_of_guests();
-		std::cout << "\n\t\t\t\t*************";
-		std::cout << "\n\t\t\t\t* MAIN MENU *";
-		std::cout << "\n\t\t\t\t*************";
-		std::cout << "\n\n\n\t\t\t1. Book A Room";
-		std::cout << "\n\t\t\t2. Guest's Information";
-		std::cout << "\n\t\t\t3. Edit Record";
-		std::cout << "\n\t\t\t4. Room's Information";
-		std::cout << "\n\t\t\t5. Exit";
-		std::cout << "\n\n\t\t\tEnter Your Choice: ";
+		std::cout << "\n\t\t\t\t *************";
+		std::cout << "\n\t\t\t\t * MAIN MENU *";
+		std::cout << "\n\t\t\t\t *************";
+		std::cout << "\n\n\n\t\t\t 1. Book A Room";
+		std::cout << "\n\t\t\t 2. Guest's Information";
+		std::cout << "\n\t\t\t 3. Remove Room";
+		std::cout << "\n\t\t\t 4. Room's Information";
+		std::cout << "\n\t\t\t 5. Exit";
+		std::cout << "\n\n\t\t\t Enter Your Choice: ";
 
 		switch (_getch()) {
 		case '1':
@@ -270,7 +338,7 @@ void Hotel::menu() {
 			guest_info();
 			break;
 		case '3':
-			edit();
+			remove_room();
 			break;
 		case '4':
 			room_info();
