@@ -16,12 +16,12 @@ private:
 	std::string name;
 	std::string citizen_id;
 	int age;
-	int room_num;
+
 	friend class Hotel;
 
 public:
 	Person() {
-		age = room_num = 0;
+		age = 0;
 		name = "";
 		citizen_id = "";
 	}
@@ -51,6 +51,8 @@ public:
 	void remove_room();
 	void guest_info();
 	void save_info();
+	void edit_info();
+
 };
 
 
@@ -60,9 +62,9 @@ void Hotel::save_info() {
 	std::ofstream file("temp.txt");
 	if (file.is_open()) {
 		for (int i = 0; i < guests.size(); i++) {
-			file << "NAME (" << i + 1 << "): " << guests[i].second.name << std::endl;
-			file << "CITIZEN ID (" << i + 1 << "): " << guests[i].second.citizen_id << std::endl;
-			file << "AGE (" << i + 1 << "): " << guests[i].second.age << std::endl;
+			file << "NAME: " << guests[i].second.name << std::endl;
+			file << "CITIZEN ID: " << guests[i].second.citizen_id << std::endl;
+			file << "AGE: " << guests[i].second.age << std::endl;
 			file << "DAYS BOOKED: " << guests[i].first[0] << std::endl;
 			file << "ROOM NUMBER: " << guests[i].first[1] << std::endl;
 			file << "---------------------------------------------------" << std::endl;
@@ -73,8 +75,8 @@ void Hotel::save_info() {
 	else std::cout << "\n\t\t\t\t Unable to open file" << std::endl;
 
 
-	remove("input.txt");
-	if (rename("temp.txt", "info.txt")) {};
+	remove("info.txt");
+	if (rename("temp.txt", "info.txt")) {}
 }
 
 
@@ -94,14 +96,12 @@ void Hotel::book() {
 		do {
 			std::cout << "\n\t\t\t\t Room number: ";
 			std::cin >> room_num;
-			if (n_rooms[room_num - 1]) std::cout << "\n\t\t\t\t The room is not available." << std::endl;
-			else if (1 > room_num || room_num > 101) std::cout << "\n\t\t\t\t The room is not correct." << std::endl;
-		} while ((1 > room_num || room_num > 101) || (n_rooms[room_num - 1]));
+			if (n_rooms[room_num - 1] > 0) std::cout << "\n\t\t\t\t The room is not available." << std::endl;
+			else if (1 > room_num || room_num >= 101) std::cout << "\n\t\t\t\t The room is not correct." << std::endl;
+		} while (1 > room_num || room_num >= 101 || n_rooms[room_num - 1] > 0);
 
 
 		temp.first[1] = room_num;
-		temp.second.room_num = room_num;
-
 
 		int people_num;
 		std::cout << "\n\t\t\t\t Number of people: ";
@@ -120,9 +120,9 @@ void Hotel::book() {
 			std::cin >> temp.second.age;
 
 
-			file << "NAME (" << i + 1 << "): " << temp.second.name << std::endl;
-			file << "CITIZEN ID (" << i + 1 << "): " << temp.second.citizen_id << std::endl;
-			file << "AGE (" << i + 1 << "): " << temp.second.age << std::endl;
+			file << "NAME: " << temp.second.name << std::endl;
+			file << "CITIZEN ID: " << temp.second.citizen_id << std::endl;
+			file << "AGE: " << temp.second.age << std::endl;
 			file << "DAYS BOOKED: " << temp.first[0] << std::endl;
 			file << "ROOM NUMBER: " << room_num << std::endl;
 			file << "---------------------------------------------------" << std::endl;
@@ -130,7 +130,6 @@ void Hotel::book() {
 			guests.push_back(temp);
 			
 		}
-
 
 		n_rooms[room_num - 1] += people_num;
 		file.close();
@@ -239,8 +238,8 @@ void Hotel::room_info() {
 		std::cout << "\n\t\t\t\t Enter room number: ";
 		std::cin >> room_number;
 
-		if (1 > room_number || room_number > 101) std::cout << "\n\t\t\t\t The room is not found!" << std::endl;
-	} while (1 > room_number || room_number > 101);
+		if (1 > room_number || room_number >= 101) std::cout << "\n\t\t\t\t The room is not found!" << std::endl;
+	} while (1 > room_number || room_number >= 101);
 
 	if (n_rooms[room_number - 1] > 0) {
 		for (int i = 0; i < guests.size(); i++) {
@@ -280,16 +279,17 @@ void Hotel::guest_info() {
 					k++; g++;	
 				}
 				
-				if (k == guest_name.size() || g == guests[i].second.name.size()) {
+				if (k == guest_name.size()) {
 					res = true;
 
 					std::cout << "\n\t\t\t\t NAME: " << guests[i].second.name << std::endl;
-					std::cout << "\n\t\t\t\t CITIZEN_ID: " << guests[i].second.citizen_id << std::endl;
-					std::cout << "\n\t\t\t\t AGE: " << guests[i].second.age << std::endl;
-					std::cout << "\n\t\t\t\t ROOM: " << guests[i].first[1] << std::endl;
-					std::cout << "\n\t\t\t\t ---------------------------------" << std::endl;
+					std::cout << "\t\t\t\t CITIZEN_ID: " << guests[i].second.citizen_id << std::endl;
+					std::cout << "\t\t\t\t AGE: " << guests[i].second.age << std::endl;
+					std::cout << "\t\t\t\t ROOM: " << guests[i].first[1] << std::endl;
+					std::cout << "\t\t\t\t ---------------------------------" << std::endl;
+					break;
 				}
-				break;
+
 			}
 		}
 	}
@@ -327,8 +327,109 @@ void Hotel::remove_room() {
 
 	save_info();
 
+	std::cout << "\n\t\t\t\t Remove room complete..." << std::endl;
+
 	if (_getch()) {}
 
+}
+
+
+void Hotel::edit_info() {
+	int room_number;
+	do {
+		system("cls");
+		std::cout << "\n\t\t\t\t Enter room number: ";
+		std::cin >> room_number;
+
+		if (1 > room_number || room_number >= 101) std::cout << "\n\t\t\t\t The room is not found." << std::endl;
+		else if (n_rooms[room_number - 1] == 0) std::cout << "\n\t\t\t\t The room is empty." << std::endl;
+	} while (1 > room_number || room_number >= 101 || n_rooms[room_number - 1] == 0);
+
+	std::vector<int> find_rooms;
+
+	for (int i = 0; i < guests.size(); i++) {
+		if (room_number == guests[i].first[1]) {
+			find_rooms.push_back(i);
+			if (find_rooms.size() == n_rooms[room_number - 1]) break;
+
+		}
+	}
+
+
+	int n = -1;
+
+	if (find_rooms.size() > 1) {
+		for (int i = 0; i < find_rooms.size(); i++) {
+			std::cout << "\n\t\t\t\t ***NUMBER: " << i + 1 << std::endl;
+			std::cout << "\t\t\t\t NAME: " << guests[find_rooms[i]].second.name << std::endl;
+			std::cout << "\t\t\t\t CITIZEN_ID: " << guests[find_rooms[i]].second.citizen_id << std::endl;
+			std::cout << "\t\t\t\t AGE: " << guests[find_rooms[i]].second.age << std::endl;
+			std::cout << "\t\t\t\t ROOM: " << guests[find_rooms[i]].first[1] << std::endl;
+			std::cout << "\t\t\t\t ---------------------------------" << std::endl;
+		}
+
+		
+		do {
+			std::cout << "\n\t\t\t\t Enter guest's number to edit info: ";
+			std::cin >> n;
+		} while (0 >= n || n > find_rooms.size());
+	}
+	
+
+	system("cls");
+
+	std::cout << "\n\t\t\t\t ***** CURRENT INFO *****" << std::endl;
+	std::cout << "\t\t\t\t NAME: " << guests[find_rooms[n - 1]].second.name << std::endl;
+	std::cout << "\t\t\t\t CITIZEN_ID: " << guests[find_rooms[n - 1]].second.citizen_id << std::endl;
+	std::cout << "\t\t\t\t AGE: " << guests[find_rooms[n - 1]].second.age << std::endl;
+	std::cout << "\t\t\t\t ROOM: " << guests[find_rooms[n - 1]].first[1] << std::endl;
+	
+	std::cout << "\n\t\t\t\t ***** NEW INFO *****" << std::endl;
+	std::cout << "\t\t\t\t NAME: ";
+	std::cin >> guests[find_rooms[n - 1]].second.name;
+
+	std::cout << "\t\t\t\t CITIZEN_ID: ";
+	std::cin >> guests[find_rooms[n - 1]].second.citizen_id;
+
+	std::cout << "\t\t\t\t AGE: ";
+	std::cin >> guests[find_rooms[n - 1]].second.age;
+
+	int new_room;
+	std::cout << "\t\t\t\t ROOM: ";
+	std::cin >> new_room;
+
+	int new_days;
+
+	std::cout << "\t\t\t\t DAYS: ";
+	std::cin >> new_days;
+
+	if (new_room != guests[find_rooms[n - 1]].first[1]) {
+		n_rooms[guests[find_rooms[n - 1]].first[1] - 1] -= 1;
+		
+		guests[find_rooms[n - 1]].first[1] = new_room;
+		
+		n_rooms[new_room - 1] += 1;
+		
+		for (int i = 0; i < guests.size(); i++) {
+			if (guests[i].first[1] == new_room)
+				guests[i].first[0] = new_days;
+		}
+		
+		guests[find_rooms[n - 1]].first[0] = new_days;
+
+	}
+	else {
+
+		for (int i = 0; i < find_rooms.size(); i++) {
+			guests[find_rooms[i]].first[0] = new_days;
+		}
+	}
+
+
+	save_info();
+
+	std::cout << "\n\t\t\t\t Editing info complete..." << std::endl;
+	if (_getch()) {}
 }
 
 
@@ -345,7 +446,8 @@ void Hotel::menu() {
 		std::cout << "\n\t\t\t 2. Guest's Information";
 		std::cout << "\n\t\t\t 3. Remove Room";
 		std::cout << "\n\t\t\t 4. Room's Information";
-		std::cout << "\n\t\t\t 5. Exit";
+		std::cout << "\n\t\t\t 5. Edit Information";
+		std::cout << "\n\t\t\t 6. Exit";
 		std::cout << "\n\n\t\t\t Enter Your Choice: ";
 
 		switch (_getch()) {
@@ -362,6 +464,9 @@ void Hotel::menu() {
 			room_info();
 			break;
 		case '5':
+			edit_info();
+			break;
+		case '6':
 			exit(0);
 		default:
 			break;
