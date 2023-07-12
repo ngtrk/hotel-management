@@ -7,7 +7,7 @@
 #include <process.h>
 #include <dos.h>
 #include <vector>
-
+#include <chrono>
 
 #define N_ROOMS 100
 
@@ -32,7 +32,7 @@ class Hotel {
 private:
 	int days;
 	int n_rooms[N_ROOMS];
-
+	int booking_date[N_ROOMS][3];
 	std::vector<std::pair<int[2], Person>> guests; // int[2] for days and room_num
 
 public:
@@ -40,9 +40,13 @@ public:
 		days = 0;
 
 		for (int i = 0; i < N_ROOMS; ++i) n_rooms[i] = 0;
-
+		for (int i = 0; i < N_ROOMS; ++i) {
+			for (int j = 0; j < 3; j++) booking_date[i][j] = 0;
+		}
 	}
 
+	void get_current_date(int []);
+	double date_diff(int[], int[]);
 
 	void menu();
 	void book();
@@ -57,6 +61,47 @@ public:
 
 
 
+double Hotel::date_diff(int date1[], int date2[]) {
+	//to calculate fare/fee of a room, use this func
+	std::tm dur[2]{ {0, 0, 0, date1[0], date1[1] - 1, date1[2] - 1900}, {0, 0, 0, date2[0], date2[1] - 1, date2[2] - 1900} };
+
+	std::time_t t1 {std::mktime(dur)}, t2{ std::mktime(dur + 1) };
+
+	if (t1 != (std::time_t)(-1) && t2 != (std::time_t)(-1)) {
+		return std::difftime(t2, t1) / (60 * 60 * 24);
+	}
+
+	return (double)INFINITY;
+
+}
+
+
+void Hotel::get_current_date(int t[]) {
+	auto start = std::chrono::system_clock::now();
+	auto legacyStart = std::chrono::system_clock::to_time_t(start);
+	char tmBuff[30];
+	ctime_s(tmBuff, sizeof(tmBuff), &legacyStart);
+
+	std::string month;
+
+	for (int i = 4; i < 7; i++) {
+		month.push_back(tmBuff[i]);
+	}
+
+
+	t[2] = (tmBuff[8] - '0') * 10 + (tmBuff[9] - '0');
+	t[0] = (tmBuff[20] - '0') * 1000 + (tmBuff[21] - '0') * 100 + (tmBuff[22] - '0') * 10 + (tmBuff[23] - '0');
+
+	std::string month_list[12] = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
+	for (int i = 0; i < 12; i++) {
+		if (month.compare(month_list[i]) == 0) {
+			t[1] = i + 1;
+			break;
+
+		}
+	}
+}
+
 
 void Hotel::save_info() {
 	std::ofstream file("temp.txt");
@@ -67,6 +112,8 @@ void Hotel::save_info() {
 			file << "AGE: " << guests[i].second.age << std::endl;
 			file << "DAYS BOOKED: " << guests[i].first[0] << std::endl;
 			file << "ROOM NUMBER: " << guests[i].first[1] << std::endl;
+			file << "START DATE (Y/M/D): " << booking_date[guests[i].first[1] - 1][0] << "-" << 
+				booking_date[guests[i].first[1] - 1][1] << "-" << booking_date[guests[i].first[1] - 1][2] << std::endl;
 			file << "---------------------------------------------------" << std::endl;
 		}
 		
@@ -89,7 +136,7 @@ void Hotel::book() {
 	
 	if (file.is_open()) {
 
-		std::cout << "\n\t\t\t\t Days booked: ";
+		std::cout << "\n\t\t\t\t Days to stay: ";
 		std::cin >> temp.first[0];
 		
 		int room_num;
@@ -102,6 +149,10 @@ void Hotel::book() {
 
 
 		temp.first[1] = room_num;
+		int get_date[] = { 0,0,0 };
+		get_current_date(get_date);
+		for (int i = 0; i < 3; i++) booking_date[room_num - 1][i] = get_date[i];
+
 
 		int people_num;
 		std::cout << "\n\t\t\t\t Number of people: ";
@@ -123,7 +174,8 @@ void Hotel::book() {
 			file << "NAME: " << temp.second.name << std::endl;
 			file << "CITIZEN ID: " << temp.second.citizen_id << std::endl;
 			file << "AGE: " << temp.second.age << std::endl;
-			file << "DAYS BOOKED: " << temp.first[0] << std::endl;
+			file << "START DATE (Y/M/D): " << get_date[0] << "-" << get_date[1] << "-" << get_date[2] << std::endl;
+			file << "DAYS TO STAY: " << temp.first[0] << std::endl;
 			file << "ROOM NUMBER: " << room_num << std::endl;
 			file << "---------------------------------------------------" << std::endl;
 			
@@ -212,12 +264,22 @@ void Hotel::list_of_guests() {
 
 						if (0 <= days_of_room[1] - 1 && days_of_room[1] - 1 < 100) n_rooms[days_of_room[1] - 1] += 1;
 					}
-					else {
+					else if (line[0] == 'C' && line[1] == 'I') {
 						while (i < line.size()) {
 							person.citizen_id.push_back(line[i]);
 							i++;
 						}
 
+					}
+					else {
+						if (i + 4 < line.size()) booking_date[days_of_room[1] - 1][0] = (line[i] - '0') * 1000 + (line[i + 1] - '0') * 100 + (line[i + 2] - '0') * 10 + (line[i + 3] - '0');
+						if (line[i + 6] == '-') {
+							booking_date[days_of_room[1] - 1][1] = (line[i + 5] - '0');
+						}
+						else booking_date[days_of_room[1] - 1][1] = (line[i + 5] - '0') * 10 + (line[i + 6] - '0');
+
+						if (i + 9 >= line.size()) booking_date[days_of_room[1] - 1][2] = (line[i + 8] - '0');
+						else booking_date[days_of_room[1] - 1][2] = (line[i + 8] - '0') * 10 + (line[i + 9] - '0');
 					}
 
 				}
@@ -247,6 +309,8 @@ void Hotel::room_info() {
 				std::cout << "\n\t\t\t\t NAME: " << guests[i].second.name << std::endl;
 				std::cout << "\n\t\t\t\t CITIZEN_ID: " << guests[i].second.citizen_id << std::endl;
 				std::cout << "\n\t\t\t\t AGE: " << guests[i].second.age << std::endl;
+				std::cout << "\n\t\t\t\t START DATE: " << booking_date[room_number - 1][0] << 
+					"-" << booking_date[room_number - 1][1] << "-" << booking_date[room_number - 1][2] << std::endl;
 				std::cout << "\n\t\t\t\t ---------------------------------" << std::endl;
 
 			}
@@ -313,6 +377,11 @@ void Hotel::remove_room() {
 
 	
 	if (n_rooms[room_number - 1] > 0) {
+
+		if (n_rooms[room_number - 1] == 1) {
+			booking_date[room_number - 1][0] = booking_date[room_number - 1][1] = booking_date[room_number - 1][2] = 0;
+		}
+
 		for (int i = 0; i < guests.size(); i++) {
 			if (room_number == guests[i].first[1]) {
 				std::iter_swap(guests.begin() + i, guests.end()-1);
@@ -404,6 +473,13 @@ void Hotel::edit_info() {
 	std::cin >> new_days;
 
 	if (new_room != guests[find_rooms[n - 1]].first[1]) {
+		if (n_rooms[new_room - 1] == 0) {
+			int get_date[] = { 0, 0, 0 };
+			get_current_date(get_date);
+			booking_date[new_room - 1][0] = get_date[0];
+			booking_date[new_room - 1][1] = get_date[1];
+			booking_date[new_room - 1][2] = get_date[2];
+		}
 		n_rooms[guests[find_rooms[n - 1]].first[1] - 1] -= 1;
 		
 		guests[find_rooms[n - 1]].first[1] = new_room;
