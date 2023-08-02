@@ -1,13 +1,10 @@
 #include <fstream>
 #include <iostream>
 #include <conio.h>
-#include <stdio.h>
 #include <string>
-#include <stdlib.h>
-#include <process.h>
-#include <dos.h>
 #include <vector>
 #include <chrono>
+
 
 #define N_ROOMS 100
 
